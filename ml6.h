@@ -1,7 +1,10 @@
 /*========== ml6.h ==========
+
 Header file for fucntions we will use in ml6
+
 Sets the maximum XYES and YRES for images as well
 as the maximum color value you want to use.
+
 Creates the point structure in order to represent 
 a pixel as a color triple
 =========================*/

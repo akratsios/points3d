@@ -11,153 +11,200 @@
 /*======== void add_sphere() ==========
   Inputs:   struct matrix * points
             double cx
-      double cy
-      double r
-      double step  
+	    double cy
+	    double r
+	    double step  
   Returns: 
+
   adds all the points for a sphere with center 
   (cx, cy) and radius r.
+
   should call generate_sphere to create the
   necessary points
+
   jdyrlandweaver
   ====================*/
 void add_sphere( struct matrix * points, 
-     double cx, double cy, double r, 
-     double step ) {
-  struct matrix *g= new_matrix(4,4);
-  generate_sphere(g,cx,cy,r,step);
-  int x,y,z,col;
-  for(col=0; col < g->lastcol; col++){
-    x = g->m[0][col];
-    y = g->m[1][col];
-    z = g->m[2][col];
-    add_edge(points,x,y,z,x,y,z);
-  }
-  
+								 double cx, double cy, double r, 
+								 double step ) {
+
+	
+  int col;
+  struct matrix *temp;
+	
+  temp = new_matrix(4,1);
+	generate_sphere(temp, cx, cy, r, step);
+	for(col = 0; col < temp->cols; col++) {
+		add_edge(points,
+						 temp->m[0][col],
+						 temp->m[1][col],
+						 temp->m[2][col],
+						 temp->m[0][col],
+						 temp->m[1][col],
+						 temp->m[2][col]);
+	}
 }
 
 /*======== void generate_sphere() ==========
   Inputs:   struct matrix * points
-            double cx
-      double cy
-      double r
-      double step  
+	double cx
+	double cy
+	double r
+	double step  
   Returns: 
+
   Generates all the points along the surface of a 
   sphere with center (cx, cy) and radius r
+
   Adds these points to the matrix parameter
+
   03/22/12 11:30:26
   jdyrlandweaver
   ====================*/
 void generate_sphere( struct matrix * points, 
-          double cx, double cy, double r, 
-          double step ) {
-  double x,y,z,t,p;
-  for(p=0; p<1+step; p+=(step*0.01)){
-    for(t=0; t<1+step; t+=(step*0.01)){
-      x = r*cos(2*M_PI*t) + cx;
-      y = r*sin(2*M_PI*t)*cos(M_PI*p) + cy;
-      z = r*sin(2*M_PI*t)*sin(M_PI*p);
-      add_point(points,x,y,z);
-    }
-  }
-}    
+											double cx, double cy, double r, 
+											double step ) {
+  double i;
+  struct matrix * temp;
+	/* from notes */
+	/*  1     0        0     0   rcos(theta)   x */
+	/* 	0 cos(phi) -sin(phi) 0 * rsin(theta) = y */
+	/* 	0 sin(phi)  cos(phi) 0       1         z */
+	/* 	0     0        0     1       0           */
+
+	
+	for (i = 0; i < M_PI / 2; i += step) {
+		add_circle(points, cx, cy, r, step);
+
+		temp = make_translate(-1*cx, 0, 0);
+
+		//rotate
+		matrix_mult(make_rotX(i), temp);
+		matrix_mult(temp, points);
+
+		temp = make_translate(cx, 0, 0);
+		matrix_mult(temp, points);
+	}
+}  
 
 /*======== void add_torus() ==========
   Inputs:   struct matrix * points
-            double cx
-      double cy
-      double r1
-      double r2
-      double step  
+	double cx
+	double cy
+	double r1
+	double r2
+	double step  
   Returns: 
+
   adds all the points required to make a torus
   with center (cx, cy) and radii r1 and r2.
+
   should call generate_torus to create the
   necessary points
+
   03/22/12 13:34:03
   jdyrlandweaver
   ====================*/
 void add_torus( struct matrix * points, 
-    double cx, double cy, double r1, double r2, 
-    double step ) {
-  struct matrix *g= new_matrix(4,4);
-  generate_torus(g,cx,cy,r1,r2,step);
-  int x,y,z,col;
-  for(col=0; col < g->lastcol; col++){
-    x = g->m[0][col];
-    y = g->m[1][col];
-    z = g->m[2][col];
-    add_edge(points,x,y,z,x,y,z);
+								double cx, double cy, double r1, double r2, 
+								double step ) {
+  struct matrix *temp;
+  temp = new_matrix(4,1);
+
+  generate_torus(temp, cx, cy, r1, r2, step);
+
+  int col;
+  for(col = 0; col < temp->cols; col++) {
+    add_edge(points,
+						 temp->m[0][col],
+						 temp->m[1][col],
+						 temp->m[2][col],
+						 temp->m[0][col],
+						 temp->m[1][col],
+						 temp->m[2][col]);
   }
 }
-
 /*======== void generate_torus() ==========
   Inputs:   struct matrix * points
-            double cx
-      double cy
-      double r
-      double step  
+	double cx
+	double cy
+	double r
+	double step  
   Returns: 
+
   Generates all the points along the surface of a 
   tarus with center (cx, cy) and radii r1 and r2
+
   Adds these points to the matrix parameter
+
   jdyrlandweaver
   ====================*/
 void generate_torus( struct matrix * points, 
-         double cx, double cy, double r1, double r2, 
-         double step ) {
-  double x,y,z,t,p;
-  for(p=0; p<1+step; p+=(step*0.01)){
-    for(t=0; t<1+step; t+=(step*0.01)){
-      x = r1*cos(2*M_PI*t) + cx;
-      y = cos(2*M_PI*p)*(r1*sin(2*M_PI*t)+r2) + cy;
-      z = sin(2*M_PI*p)*(r1*sin(2*M_PI*t)+r2);
-      add_point(points,x,y,z);
-    }
+										 double cx, double cy, double r1, double r2, 
+										 double step ) {
+  double i;
+  struct matrix * temp;
+  
+  for (i = 0; i < M_PI; i += step) {
+    add_circle(points, cx, cy, r2 - r1, step);
+    
+    temp = make_translate(-1*cx + r1, 0, 0);
+    matrix_mult(make_rotZ(i), temp);
+    matrix_mult(temp, points);
+
+    temp = make_translate(cx - r1, 0, 0);
+    matrix_mult(temp, points);
   }
 }
 
 /*======== void add_box() ==========
   Inputs:   struct matrix * points
-            double x
-      double y
-      double z
-      double width
-      double height
-      double depth
+	double x
+	double y
+	double z
+	double width
+	double height
+	double depth
   Returns: 
+
   add the points for a rectagular prism whose 
   upper-left corner is (x, y, z) with width, 
   height and depth dimensions.
+
   jdyrlandweaver
   ====================*/
+
 void add_box( struct matrix * points,
-        double x, double y, double z,
-        double width, double height, double depth ) {
-  add_point(points, x, y,z);
-  add_point(points, x+width, y, z);
-  add_point(points, x, y-height, z);
-  add_point(points, x+width, y-height, z);
-  add_point(points, x, y, z-depth);
-  add_point(points, x+width, y, z-depth);
-  add_point(points, x, y-height, z-depth);
-  add_point(points, x+width, y-height, z-depth);
-}
+							double x, double y, double z,
+							double width, double height, double depth ) {
+	
+	// Initial edge, add corresponding values to shift it 
+  add_edge(points, x, y, z, x, y, z);
+  add_edge(points, x + width, y, z, x + width, y, z);
+  add_edge(points, x, y + height, z, x, y + height, z);
+  add_edge(points, x + width, y + height, z, x + width, y + height, z);
   
+  add_edge(points, x, y, z + depth, x, y, z + depth);
+  add_edge(points, x + width, y, z + depth, x + width, y, z + depth);
+  add_edge(points, x, y + height, z + depth, x, y + height, z + depth);
+  add_edge(points, x + width, y + height, z + depth, x + width, y + height, z + depth);
+}
+
 /*======== void add_circle() ==========
   Inputs:   struct matrix * points
-            double cx
-      double cy
-      double y
-      double step  
+	double cx
+	double cy
+	double y
+	double step  
   Returns: 
+
+
   03/16/12 19:53:52
   jdyrlandweaver
   ====================*/
 void add_circle( struct matrix * points, 
-     double cx, double cy, 
-     double r, double step ) {
+								 double cx, double cy, 
+								 double r, double step ) {
   
   double x0, y0, x, y, t;
   
@@ -190,18 +237,20 @@ Inputs:   struct matrix *points
          double step
          int type  
 Returns: 
+
 Adds the curve bounded by the 4 points passsed as parameters
 of type specified in type (see matrix.h for curve type constants)
 to the matrix points
+
 03/16/12 15:24:25
 jdyrlandweaver
 ====================*/
 void add_curve( struct matrix *points, 
-    double x0, double y0, 
-    double x1, double y1, 
-    double x2, double y2, 
-    double x3, double y3, 
-    double step, int type ) {
+		double x0, double y0, 
+		double x1, double y1, 
+		double x2, double y2, 
+		double x3, double y3, 
+		double step, int type ) {
 
   double x, y, t;
   struct matrix * xcoefs;
@@ -270,8 +319,8 @@ add the line connecting (x0, y0, z0) to (x1, y1, z1) to points
 should use add_point
 ====================*/
 void add_edge( struct matrix * points, 
-         double x0, double y0, double z0, 
-         double x1, double y1, double z1) {
+	       double x0, double y0, double z0, 
+	       double x1, double y1, double z1) {
   add_point( points, x0, y0, z0 );
   add_point( points, x1, y1, z1 );
 }
@@ -297,8 +346,8 @@ void draw_lines( struct matrix * points, screen s, color c) {
   for ( i = 0; i < points->lastcol - 1; i+=2 ) {
 
     draw_line( points->m[0][i], points->m[1][i], 
-         points->m[0][i+1], points->m[1][i+1], s, c);
-  }          
+	       points->m[0][i+1], points->m[1][i+1], s, c);
+  } 	       
 }
 
 
@@ -329,17 +378,17 @@ void draw_line(int x0, int y0, int x1, int y1, screen s, color c) {
       d = dy - ( dx / 2 );
   
       while ( x <= x1 ) {
-  plot(s, c, x, y);
+	plot(s, c, x, y);
 
-  if ( d < 0 ) {
-    x = x + 1;
-    d = d + dy;
-  }
-  else {
-    x = x + 1;
-    y = y + 1;
-    d = d + dy - dx;
-  }
+	if ( d < 0 ) {
+	  x = x + 1;
+	  d = d + dy;
+	}
+	else {
+	  x = x + 1;
+	  y = y + 1;
+	  d = d + dy - dx;
+	}
       }
     }
 
@@ -348,16 +397,16 @@ void draw_line(int x0, int y0, int x1, int y1, screen s, color c) {
       d = ( dy / 2 ) - dx;
       while ( y <= y1 ) {
 
-  plot(s, c, x, y );
-  if ( d > 0 ) {
-    y = y + 1;
-    d = d - dx;
-  }
-  else {
-    y = y + 1;
-    x = x + 1;
-    d = d + dy - dx;
-  }
+	plot(s, c, x, y );
+	if ( d > 0 ) {
+	  y = y + 1;
+	  d = d - dx;
+	}
+	else {
+	  y = y + 1;
+	  x = x + 1;
+	  d = d + dy - dx;
+	}
       }
     }
   }
@@ -372,17 +421,17 @@ void draw_line(int x0, int y0, int x1, int y1, screen s, color c) {
   
       while ( x <= x1 ) {
 
-  plot(s, c, x, y);
+	plot(s, c, x, y);
 
-  if ( d > 0 ) {
-    x = x + 1;
-    d = d + dy;
-  }
-  else {
-    x = x + 1;
-    y = y - 1;
-    d = d + dy + dx;
-  }
+	if ( d > 0 ) {
+	  x = x + 1;
+	  d = d + dy;
+	}
+	else {
+	  x = x + 1;
+	  y = y - 1;
+	  d = d + dy + dx;
+	}
       }
     }
 
@@ -392,18 +441,19 @@ void draw_line(int x0, int y0, int x1, int y1, screen s, color c) {
       d =  (dy / 2) + dx;
 
       while ( y >= y1 ) {
-  
-  plot(s, c, x, y );
-  if ( d < 0 ) {
-    y = y - 1;
-    d = d + dx;
-  }
-  else {
-    y = y - 1;
-    x = x + 1;
-    d = d + dy + dx;
-  }
+	
+	plot(s, c, x, y );
+	if ( d < 0 ) {
+	  y = y - 1;
+	  d = d + dx;
+	}
+	else {
+	  y = y - 1;
+	  x = x + 1;
+	  d = d + dy + dx;
+	}
       }
     }
   }
 }
+

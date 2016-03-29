@@ -8,6 +8,7 @@
 Inputs:  int rows
          int cols 
 Returns: 
+
 Once allocated, access the matrix as follows:
 m->m[r][c]=something;
 if (m->lastcol)... 
@@ -35,6 +36,7 @@ struct matrix *new_matrix(int rows, int cols) {
 /*-------------- void free_matrix() --------------
 Inputs:  struct matrix *m 
 Returns: 
+
 1. free individual rows
 2. free array holding row pointers
 3. free actual matrix
@@ -54,6 +56,7 @@ void free_matrix(struct matrix *m) {
 Inputs:  struct matrix *m
          int newcols 
 Returns: 
+
 Reallocates the memory for m->m such that it now has
 newcols number of collumns
 ====================*/
@@ -70,6 +73,7 @@ void grow_matrix(struct matrix *m, int newcols) {
 /*-------------- void print_matrix() --------------
 Inputs:  struct matrix *m 
 Returns: 
+
 print the matrix
 */
 void print_matrix(struct matrix *m) {
@@ -85,6 +89,7 @@ void print_matrix(struct matrix *m) {
 /*-------------- void ident() --------------
 Inputs:  struct matrix *m <-- assumes m is a square matrix
 Returns: 
+
 turns m in to an identity matrix
 */
 void ident(struct matrix *m) {
@@ -94,9 +99,9 @@ void ident(struct matrix *m) {
     for (c=0; c < m->cols; c++)  {
 
       if ( r == c )
-  m->m[r][c] = 1;
+	m->m[r][c] = 1;
       else
-  m->m[r][c] = 0;
+	m->m[r][c] = 0;
     }
   }
 }
@@ -106,6 +111,7 @@ void ident(struct matrix *m) {
 Inputs:  double x
          struct matrix *m 
 Returns: 
+
 multiply each element of m by x
 */
 void scalar_mult(double x, struct matrix *m) {
@@ -124,6 +130,7 @@ void scalar_mult(double x, struct matrix *m) {
 Inputs:  struct matrix *a
          struct matrix *b 
 Returns: 
+
 a*b -> b
 */
 void matrix_mult(struct matrix *a, struct matrix *b) {
@@ -138,9 +145,9 @@ void matrix_mult(struct matrix *a, struct matrix *b) {
 
     for (r=0; r < 4; r++) {
       b->m[r][c] =  a->m[r][0] * tmp->m[0][0] + 
-  a->m[r][1] * tmp->m[1][0] +
-  a->m[r][2] * tmp->m[2][0] +
-  a->m[r][3] * tmp->m[3][0];
+	a->m[r][1] * tmp->m[1][0] +
+	a->m[r][2] * tmp->m[2][0] +
+	a->m[r][3] * tmp->m[3][0];
     }
   }
   
@@ -153,6 +160,7 @@ void matrix_mult(struct matrix *a, struct matrix *b) {
 Inputs:  struct matrix *a
          struct matrix *b 
 Returns: 
+
 copy matrix a to matrix b
 */
 void copy_matrix(struct matrix *a, struct matrix *b) {
@@ -204,6 +212,7 @@ struct matrix * make_scale(double x, double y, double z) {
 
 /*======== struct matrix * make_rotX() ==========
 Inputs:  double theta
+
 Returns: The rotation matrix created using theta as the 
 angle of rotation and X as the axis of rotation.
 ====================*/
@@ -260,8 +269,10 @@ struct matrix * make_rotZ(double theta) {
 /*======== struct matrix * make_bezier()) ==========
   Inputs:   
   Returns: 
+
   The correct 4x4 matrix that can be used to generate
   the coefiecients for a bezier curve
+
   03/16/12 14:36:19
   jdyrlandweaver
   ====================*/
@@ -294,8 +305,10 @@ struct matrix * make_bezier() {
 /*======== struct matrix * make_hermite()) ==========
   Inputs:   
   Returns: 
+
   The correct 4x4 matrix that can be used to generate
   the coefiecients for a hermite curve
+
   03/16/12 14:36:19
   jdyrlandweaver
   ====================*/
@@ -328,9 +341,9 @@ struct matrix * make_hermite() {
 /*======== struct matrix * generate_curve_coefs() ==========
   Inputs:   double p1
             double p2
-      double p3
-      double p4
-      int type
+	    double p3
+	    double p4
+	    int type
   Returns: 
   
   A matrix containing the values for a, b, c and d of the
@@ -338,11 +351,12 @@ struct matrix * make_hermite() {
   by p1, p2, p3 and p4.
   
   Type determines whether the curve is bezier or hermite
+
   03/16/12 14:42:46
   jdyrlandweaver
   ====================*/
 struct matrix * generate_curve_coefs( double p1, double p2, 
-              double p3, double p4, int type) {
+				      double p3, double p4, int type) {
   
   struct matrix * inverse;
   struct matrix * coefs;
@@ -374,3 +388,4 @@ struct matrix * generate_curve_coefs( double p1, double p2,
     
   return coefs;  
 }
+

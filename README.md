@@ -1,1 +1,2 @@
-# points3d
+# 3dhw
+3d assignment for graphics class
